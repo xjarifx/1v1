@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Online Plane Shooter</title>
+    <style>
+      body {
+        margin: 0;
+        background: radial-gradient(
+          circle at 20% 30%,
+          #0a0a0f,
+          #121218 50%,
+          #0a0a0f 100%
+        );
+        font-family: "Orbitron", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        min-height: 100vh;
+      }
+      #gameWrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        backdrop-filter: blur(20px);
+        padding: 20px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+      #gameContainer {
+        width: 780px;
+        height: 300px;
+        background: rgba(15, 15, 25, 0.7);
+        border-radius: 15px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 0 25px rgba(0, 255, 255, 0.15);
+      }
+      canvas {
+        display: block;
+        border-radius: 15px;
+      }
+      #cooldownContainer {
+        display: flex;
+        justify-content: space-between;
+        width: 780px;
+        margin-bottom: 15px;
+      }
+      .cooldownGroup {
+        display: flex;
+        gap: 12px;
+      }
+      .cooldownBox {
+        position: relative;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+      }
+      .cooldownBox canvas {
+        width: 48px;
+        height: 48px;
+      }
+      #instructionPanel {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 40px;
+        margin-top: 22px;
+      }
+      .control-block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+      .keyset {
+        display: flex;
+        gap: 6px;
+      }
+      .key.holo {
+        padding: 10px 14px;
+        font-size: 18px;
+        border-radius: 10px;
+        background: linear-gradient(
+          145deg,
+          rgba(0, 255, 255, 0.08),
+          rgba(0, 255, 255, 0.02)
+        );
+        border: 1px solid rgba(0, 255, 255, 0.4);
+        color: #aafaff;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.2),
+          inset 0 0 10px rgba(0, 255, 255, 0.15);
+      }
+      .key.holo:hover {
+        box-shadow: 0 0 25px rgba(0, 255, 255, 0.5),
+          inset 0 0 15px rgba(0, 255, 255, 0.3);
+        color: #fff;
+      }
+      .key.holo.mousekey {
+        background: linear-gradient(
+          145deg,
+          rgba(255, 165, 0, 0.1),
+          rgba(255, 165, 0, 0.02)
+        );
+        border-color: rgba(255, 165, 0, 0.4);
+        color: #ffd9a0;
+        text-shadow: 0 0 10px rgba(255, 165, 0, 0.6);
+        box-shadow: 0 0 15px rgba(255, 165, 0, 0.2),
+          inset 0 0 10px rgba(255, 165, 0, 0.15);
+      }
+      .label {
+        font-size: 13px;
+        text-transform: uppercase;
+        color: #b0eaff;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+        letter-spacing: 1px;
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="gameWrapper">
+      <div id="cooldownContainer">
+        <div class="cooldownGroup">
+          <div class="cooldownBox" id="p1Basic">
+            <canvas width="48" height="48"></canvas>
+          </div>
+          <div class="cooldownBox" id="p1Fast">
+            <canvas width="48" height="48"></canvas>
+          </div>
+        </div>
+        <div class="cooldownGroup">
+          <div class="cooldownBox" id="p2Basic">
+            <canvas width="48" height="48"></canvas>
+          </div>
+          <div class="cooldownBox" id="p2Fast">
+            <canvas width="48" height="48"></canvas>
+          </div>
+        </div>
+      </div>
+      <div id="gameContainer">
+        <canvas id="gameCanvas" width="780" height="300"></canvas>
+      </div>
+      <div id="instructionPanel">
+        <div class="control-block">
+          <div class="keyset">
+            <div class="key holo">⬆️</div>
+            <div class="key holo">⬇️</div>
+            <div class="key holo">⬅️</div>
+            <div class="key holo">➡️</div>
+          </div>
+          <div class="label">Movement</div>
+        </div>
+        <div class="control-block">
+          <div class="key holo mousekey">🖱️ Left</div>
+          <div class="label">Fire</div>
+        </div>
+        <div class="control-block">
+          <div class="key holo mousekey">🖱️ Right</div>
+          <div class="label">Fast Fire</div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      let playerIndex, gameState, roomId;
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+
+      const cooldownCtx = {
+        p1b: document.querySelector("#p1Basic canvas").getContext("2d"),
+        p1f: document.querySelector("#p1Fast canvas").getContext("2d"),
+        p2b: document.querySelector("#p2Basic canvas").getContext("2d"),
+        p2f: document.querySelector("#p2Fast canvas").getContext("2d"),
+      };
+
+      const keys = {},
+        mouse = { left: false, right: false };
+
+      window.addEventListener("keydown", (e) => (keys[e.key] = true));
+      window.addEventListener("keyup", (e) => (keys[e.key] = false));
+      window.addEventListener("mousedown", (e) => {
+        if (e.button === 0) mouse.left = true;
+        if (e.button === 2) mouse.right = true;
+      });
+      window.addEventListener("mouseup", (e) => {
+        if (e.button === 0) mouse.left = false;
+        if (e.button === 2) mouse.right = false;
+      });
+      window.addEventListener("contextmenu", (e) => e.preventDefault());
+
+      roomId = prompt("Enter room code:");
+      if (!roomId) {
+        alert("Room code required!");
+        location.reload();
+      }
+      socket.emit("joinRoom", roomId);
+
+      socket.on("init", (data) => {
+        playerIndex = data.playerIndex;
+        gameState = data.state;
+        console.log("Player initialized:", playerIndex); // Debug log
+      });
+      socket.on("startGame", (state) => {
+        gameState = state;
+        animate();
+        console.log("Game started"); // Debug log
+      });
+      socket.on("update", (state) => {
+        gameState = state;
+      });
+
+      socket.on("roomFull", () => {
+        alert("Room is full!");
+        location.reload();
+      });
+
+      socket.on("playerLeft", () => {
+        alert("Other player left!");
+        location.reload();
+      });
+
+      function sendInput() {
+        if (playerIndex === undefined || !roomId || !gameState) {
+          requestAnimationFrame(sendInput);
+          return;
+        }
+        const input = {
+          up: keys["ArrowUp"] || false,
+          down: keys["ArrowDown"] || false,
+          left: keys["ArrowLeft"] || false,
+          right: keys["ArrowRight"] || false,
+          fire: mouse.left || false,
+          fastFire: mouse.right || false,
+        };
+        socket.emit("input", { roomId, input });
+        requestAnimationFrame(sendInput);
+      }
+      sendInput();
+
+      function drawCooldown(ctx, ratio, color) {
+        const s = 48;
+        ctx.clearRect(0, 0, s, s);
+        if (ratio <= 0) return;
+        const ang = ratio * 2 * Math.PI;
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.4;
+        ctx.beginPath();
+        ctx.moveTo(s / 2, s / 2);
+        ctx.arc(s / 2, s / 2, s / 2, -Math.PI / 2, -Math.PI / 2 + ang);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+
+      function drawPlane(p) {
+        const topH = p.height * 0.2;
+        ctx.fillStyle = "rgba(255,255,255,0.1)";
+        ctx.fillRect(p.x, p.y, p.width, topH);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y + topH, p.width, p.height - topH);
+        ctx.fillStyle = "#00ff00";
+        const hpRatio = Math.max(0, p.hp / 50);
+        ctx.fillRect(p.x, p.y, p.width * hpRatio, topH);
+      }
+
+      function drawMissiles() {
+        ctx.shadowColor = "yellow";
+        ctx.shadowBlur = 15;
+        gameState.missiles.forEach((m) => {
+          ctx.fillStyle = "yellow";
+          ctx.fillRect(m.x, m.y, m.w, m.h);
+        });
+        ctx.shadowBlur = 0;
+      }
+
+      function animate() {
+        if (!gameState) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        gameState.players.forEach(drawPlane);
+        drawMissiles();
+        drawCooldown(cooldownCtx.p1b, gameState.players[0].basicCD / 2, "#0ff");
+        drawCooldown(
+          cooldownCtx.p1f,
+          gameState.players[0].fastCD / 7,
+          "#ffb84d"
+        );
+        drawCooldown(cooldownCtx.p2b, gameState.players[1].basicCD / 2, "#0ff");
+        drawCooldown(
+          cooldownCtx.p2f,
+          gameState.players[1].fastCD / 7,
+          "#ffb84d"
+        );
+        requestAnimationFrame(animate);
+      }
+    </script>
+  </body>
+</html>
