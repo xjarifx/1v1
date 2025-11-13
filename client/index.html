@@ -1,3 +1,6 @@
+<!-- vercel deploy link: https://1v1-cyan.vercel.app/
+render deploy link: https://onev1-h4qx.onrender.com -->
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -167,9 +170,9 @@
       </div>
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
     <script>
-      const socket = io();
+      const socket = io("https://onev1-h4qx.onrender.com");
       let playerIndex, gameState, roomId;
       const canvas = document.getElementById("gameCanvas");
       const ctx = canvas.getContext("2d");
@@ -224,6 +227,12 @@
 
       socket.on("playerLeft", () => {
         alert("Other player left!");
+        location.reload();
+      });
+
+      socket.on("gameOver", (data) => {
+        const winner = data.winner === playerIndex ? "You win!" : "You lose!";
+        alert(winner);
         location.reload();
       });
 
@@ -285,16 +294,24 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         gameState.players.forEach(drawPlane);
         drawMissiles();
-        drawCooldown(cooldownCtx.p1b, gameState.players[0].basicCD / 2, "#0ff");
+        drawCooldown(
+          cooldownCtx.p1b,
+          gameState.players[0].basicCD / 0.5,
+          "#0ff"
+        );
         drawCooldown(
           cooldownCtx.p1f,
-          gameState.players[0].fastCD / 7,
+          gameState.players[0].fastCD / 6,
           "#ffb84d"
         );
-        drawCooldown(cooldownCtx.p2b, gameState.players[1].basicCD / 2, "#0ff");
+        drawCooldown(
+          cooldownCtx.p2b,
+          gameState.players[1].basicCD / 0.5,
+          "#0ff"
+        );
         drawCooldown(
           cooldownCtx.p2f,
-          gameState.players[1].fastCD / 7,
+          gameState.players[1].fastCD / 6,
           "#ffb84d"
         );
         requestAnimationFrame(animate);

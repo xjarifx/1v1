@@ -6,13 +6,13 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-app.use(express.static(__dirname));
+app.use(express.static(__dirname + "/../client"));
 
-const TICK_RATE = 128;
-const PLAYER_SPEED = 5;
+const TICK_RATE = 60;
+const PLAYER_SPEED = 7;
 const MISSILE_SPEED_BASIC = 15;
 const MISSILE_SPEED_FAST = 25;
-const COOLDOWN_BASIC = 2;
+const COOLDOWN_BASIC = 0.5;
 const COOLDOWN_FAST = 6;
 const GAME_WIDTH = 780;
 const GAME_HEIGHT = 300;
@@ -161,6 +161,9 @@ setInterval(() => {
     io.to(roomId).emit("update", state);
   }
 }, 1000 / TICK_RATE);
+
+// vercel deploy link: https://1v1-cyan.vercel.app/
+// render deploy link: https://onev1-h4qx.onrender.com
 
 server.listen(3000, () =>
   console.log("Server running on http://localhost:3000")
