@@ -51,8 +51,11 @@
       }
       #gameWrapper {
         width: 90vw;
-        max-width: 840px;
+        max-width: 900px;
         animation: fadeIn 1s ease-out;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
       }
       @keyframes fadeIn {
         from {
@@ -167,35 +170,23 @@
         }
       }
       #inGameHUD {
-        position: absolute;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
         display: flex;
-        gap: 30px;
+        gap: 20px;
         align-items: center;
-        z-index: 10;
+        justify-content: center;
       }
       .hudCard {
         background: var(--panel);
         border: 2px solid var(--cyan);
-        border-radius: 16px;
-        padding: 14px 20px;
-        box-shadow: var(--glow);
-        min-width: 200px;
+        border-radius: 12px;
+        padding: 12px 18px;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        min-width: 180px;
         backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
-      }
-      .hudCard:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0 30px var(--cyan), 0 0 50px rgba(0, 255, 255, 0.4);
       }
       .hudCard:last-child {
         border-color: var(--orange);
-        box-shadow: var(--glow-orange);
-      }
-      .hudCard:last-child:hover {
-        box-shadow: 0 0 30px var(--orange), 0 0 50px rgba(255, 153, 51, 0.4);
+        box-shadow: 0 0 15px rgba(255, 153, 51, 0.2);
       }
       .hudTitle {
         font-size: 13px;
@@ -233,107 +224,51 @@
         justify-content: center;
       }
       .cooldownCircle {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
-        background: rgba(0, 0, 0, 0.6);
-        border: 2px solid rgba(0, 255, 255, 0.5);
+        background: rgba(0, 0, 0, 0.5);
+        border: 2px solid rgba(0, 255, 255, 0.4);
         position: relative;
         overflow: hidden;
-        box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.3),
-          0 0 15px rgba(0, 255, 255, 0.2);
-        transition: all 0.2s ease;
-      }
-      .cooldownCircle:hover {
-        transform: scale(1.1);
-        box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.5),
-          0 0 20px rgba(0, 255, 255, 0.4);
+        box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
       }
       .cooldownCircle canvas {
         width: 100%;
         height: 100%;
       }
       .hudCard:last-child .cooldownCircle {
-        border-color: rgba(255, 153, 51, 0.5);
-        box-shadow: inset 0 0 10px rgba(255, 153, 51, 0.3),
-          0 0 15px rgba(255, 153, 51, 0.2);
-      }
-      .hudCard:last-child .cooldownCircle:hover {
-        box-shadow: inset 0 0 15px rgba(255, 153, 51, 0.5),
-          0 0 20px rgba(255, 153, 51, 0.4);
+        border-color: rgba(255, 153, 51, 0.4);
+        box-shadow: 0 0 8px rgba(255, 153, 51, 0.2);
       }
       #scoreTxt {
-        font-size: 32px;
-        font-weight: 900;
-        letter-spacing: 4px;
-        text-shadow: 0 0 20px var(--cyan), 0 0 40px var(--cyan),
-          0 0 60px rgba(0, 255, 255, 0.5);
-        background: linear-gradient(45deg, var(--cyan), var(--orange));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: glow 2s ease-in-out infinite alternate;
-      }
-      @keyframes glow {
-        from {
-          filter: drop-shadow(0 0 10px var(--cyan));
-        }
-        to {
-          filter: drop-shadow(0 0 20px var(--orange));
-        }
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        color: #fff;
+        text-shadow: 0 0 15px var(--cyan);
       }
       #gameContainer {
         position: relative;
-        background: linear-gradient(
-          135deg,
-          rgba(5, 10, 20, 0.95),
-          rgba(10, 15, 30, 0.9)
-        );
-        border: 3px solid var(--cyan);
-        border-radius: 20px;
-        box-shadow: var(--glow), inset 0 0 30px rgba(0, 0, 0, 0.5);
+        background: rgba(10, 15, 30, 0.8);
+        border: 2px solid var(--cyan);
+        border-radius: 16px;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
         overflow: hidden;
-        backdrop-filter: blur(5px);
-      }
-      #gameContainer::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 255, 255, 0.03) 2px,
-            rgba(0, 255, 255, 0.03) 4px
-          ),
-          repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 255, 255, 0.03) 2px,
-            rgba(0, 255, 255, 0.03) 4px
-          );
-        pointer-events: none;
-        z-index: 1;
       }
       canvas {
         display: block;
       }
       #controls {
-        margin-top: 25px;
         display: flex;
         justify-content: space-around;
         align-items: center;
-        gap: 30px;
+        gap: 40px;
         padding: 20px;
         background: var(--panel);
-        border: 2px solid rgba(0, 255, 255, 0.3);
-        border-radius: 16px;
-        box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
+        border: 2px solid rgba(0, 255, 255, 0.2);
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
       }
       .controlBlock {
         text-align: center;
@@ -345,64 +280,43 @@
         justify-content: center;
       }
       .key {
-        padding: 12px 16px;
-        border-radius: 12px;
-        background: linear-gradient(
-          145deg,
-          rgba(0, 255, 255, 0.15),
-          rgba(0, 255, 255, 0.05)
-        );
-        border: 2px solid rgba(0, 255, 255, 0.5);
+        padding: 10px 14px;
+        border-radius: 8px;
+        background: rgba(0, 255, 255, 0.1);
+        border: 2px solid rgba(0, 255, 255, 0.4);
         color: var(--cyan);
-        font-weight: 700;
-        text-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
-        box-shadow: 0 0 20px rgba(0, 255, 255, 0.3),
-          inset 0 0 15px rgba(0, 255, 255, 0.2);
-        transition: all 0.2s ease;
+        font-weight: 600;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+        transition: all 0.15s ease;
         cursor: pointer;
-        min-width: 45px;
+        min-width: 44px;
         user-select: none;
       }
       .key:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0 30px rgba(0, 255, 255, 0.5),
-          inset 0 0 20px rgba(0, 255, 255, 0.3);
+        background: rgba(0, 255, 255, 0.15);
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
       }
       .key.pressed {
-        transform: scale(0.95) translateY(0);
-        box-shadow: 0 0 35px rgba(0, 255, 255, 0.8),
-          inset 0 0 25px rgba(0, 255, 255, 0.5);
+        transform: scale(0.95);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        background: rgba(0, 255, 255, 0.25);
         color: #fff;
-        background: linear-gradient(
-          145deg,
-          rgba(0, 255, 255, 0.3),
-          rgba(0, 255, 255, 0.1)
-        );
       }
       .key.mouse {
-        background: linear-gradient(
-          145deg,
-          rgba(255, 153, 51, 0.15),
-          rgba(255, 153, 51, 0.05)
-        );
-        border-color: rgba(255, 153, 51, 0.5);
+        background: rgba(255, 153, 51, 0.1);
+        border-color: rgba(255, 153, 51, 0.4);
         color: var(--orange);
-        text-shadow: 0 0 15px rgba(255, 153, 51, 0.8);
-        box-shadow: 0 0 20px rgba(255, 153, 51, 0.3),
-          inset 0 0 15px rgba(255, 153, 51, 0.2);
+        text-shadow: 0 0 8px rgba(255, 153, 51, 0.6);
+        box-shadow: 0 0 10px rgba(255, 153, 51, 0.2);
       }
       .key.mouse:hover {
-        box-shadow: 0 0 30px rgba(255, 153, 51, 0.5),
-          inset 0 0 20px rgba(255, 153, 51, 0.3);
+        background: rgba(255, 153, 51, 0.15);
+        box-shadow: 0 0 15px rgba(255, 153, 51, 0.3);
       }
       .key.mouse.pressed {
-        box-shadow: 0 0 35px rgba(255, 153, 51, 0.8),
-          inset 0 0 25px rgba(255, 153, 51, 0.5);
-        background: linear-gradient(
-          145deg,
-          rgba(255, 153, 51, 0.3),
-          rgba(255, 153, 51, 0.1)
-        );
+        box-shadow: 0 0 20px rgba(255, 153, 51, 0.5);
+        background: rgba(255, 153, 51, 0.25);
       }
       .label {
         font-size: 13px;
@@ -446,10 +360,10 @@
           <div class="hpBar"><div class="hpFill" id="p1Health"></div></div>
           <div class="cooldownRow">
             <div class="cooldownCircle" id="p1Basic">
-              <canvas width="40" height="40"></canvas>
+              <canvas width="36" height="36"></canvas>
             </div>
             <div class="cooldownCircle" id="p1Fast">
-              <canvas width="40" height="40"></canvas>
+              <canvas width="36" height="36"></canvas>
             </div>
           </div>
         </div>
@@ -459,10 +373,10 @@
           <div class="hpBar"><div class="hpFill" id="p2Health"></div></div>
           <div class="cooldownRow">
             <div class="cooldownCircle" id="p2Basic">
-              <canvas width="40" height="40"></canvas>
+              <canvas width="36" height="36"></canvas>
             </div>
             <div class="cooldownCircle" id="p2Fast">
-              <canvas width="40" height="40"></canvas>
+              <canvas width="36" height="36"></canvas>
             </div>
           </div>
         </div>
@@ -635,12 +549,12 @@
       };
 
       function drawCooldown(ctx, ratio, color) {
-        const s = 40;
+        const s = 36;
         ctx.clearRect(0, 0, s, s);
         if (ratio <= 0) return;
         const ang = ratio * 2 * Math.PI;
         ctx.fillStyle = color;
-        ctx.globalAlpha = 0.6;
+        ctx.globalAlpha = 0.5;
         ctx.beginPath();
         ctx.moveTo(s / 2, s / 2);
         ctx.arc(s / 2, s / 2, s / 2, -Math.PI / 2, -Math.PI / 2 + ang);
@@ -648,57 +562,47 @@
         ctx.globalAlpha = 1;
       }
       function drawPlane(p) {
-        const topH = p.height * 0.15;
-
-        // Add glow effect
+        // Add subtle glow
         ctx.shadowColor = p.color;
-        ctx.shadowBlur = 20;
+        ctx.shadowBlur = 15;
 
         // Main body
         ctx.fillStyle = p.color;
-        ctx.fillRect(p.x, p.y + topH, p.width, p.height - topH);
+        ctx.fillRect(p.x, p.y, p.width, p.height);
 
-        // Cockpit/top section
-        ctx.fillStyle = "rgba(255,255,255,0.2)";
-        ctx.fillRect(p.x, p.y, p.width, topH);
+        // Cockpit highlight
+        ctx.fillStyle = "rgba(255,255,255,0.15)";
+        ctx.fillRect(p.x, p.y, p.width, p.height * 0.2);
 
-        // Health bar
-        ctx.fillStyle = "#000";
-        ctx.fillRect(p.x, p.y - 8, p.width, 6);
+        // Health bar background
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = "rgba(0,0,0,0.6)";
+        ctx.fillRect(p.x, p.y - 6, p.width, 4);
+
+        // Health bar fill
         const hpRatio = Math.max(0, p.hp / 50);
-        const gradient = ctx.createLinearGradient(p.x, 0, p.x + p.width, 0);
         if (hpRatio > 0.5) {
-          gradient.addColorStop(0, "#00ff99");
-          gradient.addColorStop(1, "#00ffff");
+          ctx.fillStyle = "#00ff88";
         } else if (hpRatio > 0.2) {
-          gradient.addColorStop(0, "#ffff00");
-          gradient.addColorStop(1, "#ff9900");
+          ctx.fillStyle = "#ffcc00";
         } else {
-          gradient.addColorStop(0, "#ff0000");
-          gradient.addColorStop(1, "#ff6600");
+          ctx.fillStyle = "#ff4444";
         }
-        ctx.fillStyle = gradient;
-        ctx.fillRect(p.x, p.y - 8, p.width * hpRatio, 6);
+        ctx.fillRect(p.x, p.y - 6, p.width * hpRatio, 4);
 
         ctx.shadowBlur = 0;
       }
       function drawMissiles() {
         gameState.missiles.forEach((m) => {
-          ctx.shadowColor = "#ffff00";
-          ctx.shadowBlur = 25;
+          ctx.shadowColor = "#ffdd00";
+          ctx.shadowBlur = 20;
 
-          // Create gradient for missile
-          const gradient = ctx.createLinearGradient(m.x, 0, m.x + m.w, 0);
-          gradient.addColorStop(0, "#ffff00");
-          gradient.addColorStop(0.5, "#ffaa00");
-          gradient.addColorStop(1, "#ff6600");
-
-          ctx.fillStyle = gradient;
+          // Missile body
+          ctx.fillStyle = "#ffdd00";
           ctx.fillRect(m.x, m.y, m.w, m.h);
 
-          // Add core bright spot
-          ctx.shadowBlur = 35;
-          ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+          // Bright core
+          ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
           ctx.fillRect(m.x + m.w * 0.3, m.y + m.h * 0.3, m.w * 0.4, m.h * 0.4);
         });
         ctx.shadowBlur = 0;
@@ -749,25 +653,9 @@
         gameState.players[1].x = p1x;
         gameState.players[1].y = p1y;
 
-        // Clear and draw background
-        ctx.fillStyle = "rgba(5, 10, 20, 0.3)";
+        // Clear canvas with semi-transparent background
+        ctx.fillStyle = "rgba(10, 15, 30, 0.4)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Draw subtle grid
-        ctx.strokeStyle = "rgba(0, 255, 255, 0.05)";
-        ctx.lineWidth = 1;
-        for (let i = 0; i < canvas.width; i += 50) {
-          ctx.beginPath();
-          ctx.moveTo(i, 0);
-          ctx.lineTo(i, canvas.height);
-          ctx.stroke();
-        }
-        for (let i = 0; i < canvas.height; i += 50) {
-          ctx.beginPath();
-          ctx.moveTo(0, i);
-          ctx.lineTo(canvas.width, i);
-          ctx.stroke();
-        }
 
         gameState.players.forEach(drawPlane);
         drawMissiles();
