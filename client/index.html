@@ -158,32 +158,69 @@
           width: 100%;
         }
       }
-      #topBar {
+      #inGameHUD {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
         display: flex;
-        justify-content: space-between;
+        gap: 20px;
         align-items: center;
-        margin-bottom: 12px;
-        padding: 0 8px;
+        z-index: 10;
       }
-      .hud {
-        display: flex;
-        gap: 12px;
-        align-items: center;
+      .hudCard {
+        background: var(--panel);
+        border: 1px solid var(--cyan);
+        border-radius: 12px;
+        padding: 10px 16px;
+        box-shadow: var(--glow);
+        min-width: 180px;
       }
-      .healthBar {
-        width: 140px;
-        height: 14px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 7px;
+      .hudTitle {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.7;
+        margin-bottom: 6px;
+      }
+      .hpBar {
+        width: 100%;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 5px;
         overflow: hidden;
-        border: 1px solid rgba(0, 255, 255, 0.4);
       }
-      .healthFill {
+      .hpFill {
         height: 100%;
+        width: 100%;
         background: linear-gradient(90deg, var(--cyan), #00ff99);
         transition: width 0.3s ease;
       }
+      .cooldownRow {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .cooldownCircle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(0, 255, 255, 0.08);
+        border: 1px solid rgba(0, 255, 255, 0.4);
+        position: relative;
+        overflow: hidden;
+      }
+      .cooldownCircle canvas {
+        width: 100%;
+        height: 100%;
+      }
+      #scoreTxt {
+        font-size: 20px;
+        letter-spacing: 2px;
+        text-shadow: 0 0 10px var(--cyan);
+      }
       #gameContainer {
+        position: relative;
         background: var(--panel);
         border: 1px solid rgba(0, 255, 255, 0.3);
         border-radius: 16px;
@@ -248,6 +285,7 @@
     </style>
   </head>
   <body>
+    <!-- Room Code Overlay -->
     <div id="roomOverlay">
       <div id="roomBox">
         <h2>ENTER ROOM CODE</h2>
@@ -262,24 +300,40 @@
       </div>
     </div>
 
+    <!-- Waiting Loader -->
     <div id="loader" style="display: none">
       <div class="loaderText">Waiting for opponent…</div>
       <div class="bar"><div class="barFill"></div></div>
     </div>
 
+    <!-- Game Screen -->
     <div id="gameWrapper" style="display: none">
-      <div id="topBar">
-        <div class="hud">
-          <span>P1</span>
-          <div class="healthBar">
-            <div class="healthFill" id="p1Health"></div>
+      <!-- New HUD -->
+      <div id="inGameHUD">
+        <div class="hudCard">
+          <div class="hudTitle">P1 HEALTH</div>
+          <div class="hpBar"><div class="hpFill" id="p1Health"></div></div>
+          <div class="cooldownRow">
+            <div class="cooldownCircle" id="p1Basic">
+              <canvas width="36" height="36"></canvas>
+            </div>
+            <div class="cooldownCircle" id="p1Fast">
+              <canvas width="36" height="36"></canvas>
+            </div>
           </div>
         </div>
-        <div class="hud">
-          <div class="healthBar">
-            <div class="healthFill" id="p2Health"></div>
+        <div id="scoreTxt">1 V 1</div>
+        <div class="hudCard">
+          <div class="hudTitle">P2 HEALTH</div>
+          <div class="hpBar"><div class="hpFill" id="p2Health"></div></div>
+          <div class="cooldownRow">
+            <div class="cooldownCircle" id="p2Basic">
+              <canvas width="36" height="36"></canvas>
+            </div>
+            <div class="cooldownCircle" id="p2Fast">
+              <canvas width="36" height="36"></canvas>
+            </div>
           </div>
-          <span>P2</span>
         </div>
       </div>
 
@@ -318,9 +372,9 @@
       let playerIndex, gameState, roomId;
       const canvas = document.getElementById("gameCanvas");
       const ctx = canvas.getContext("2d");
-
       const keys = {},
         mouse = { left: false, right: false };
+
       window.addEventListener("keydown", (e) => {
         keys[e.key] = true;
         const k = document.querySelector(`[data-key="${e.key}"]`);
@@ -430,6 +484,19 @@
       sendInput();
 
       // ---- render helpers ----
+      function drawCooldown(ctx, ratio, color) {
+        const s = 36;
+        ctx.clearRect(0, 0, s, s);
+        if (ratio <= 0) return;
+        const ang = ratio * 2 * Math.PI;
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.4;
+        ctx.beginPath();
+        ctx.moveTo(s / 2, s / 2);
+        ctx.arc(s / 2, s / 2, s / 2, -Math.PI / 2, -Math.PI / 2 + ang);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
       function drawPlane(p) {
         const topH = p.height * 0.2;
         ctx.shadowColor = p.color;
@@ -501,6 +568,27 @@
         gameState.players.forEach(drawPlane);
         drawMissiles();
         updateHealth();
+        // cooldown rings
+        drawCooldown(
+          cooldownCtx.p1b,
+          gameState.players[0].basicCD / 0.5,
+          "#0ff"
+        );
+        drawCooldown(
+          cooldownCtx.p1f,
+          gameState.players[0].fastCD / 6,
+          "#ffb84d"
+        );
+        drawCooldown(
+          cooldownCtx.p2b,
+          gameState.players[1].basicCD / 0.5,
+          "#0ff"
+        );
+        drawCooldown(
+          cooldownCtx.p2f,
+          gameState.players[1].fastCD / 6,
+          "#ffb84d"
+        );
         requestAnimationFrame(animate);
       }
     </script>
