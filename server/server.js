@@ -123,7 +123,7 @@ setInterval(() => {
 
       if (inp.fire && p.basicCD <= 0) {
         state.missiles.push({
-          x: p.x + (i === 0 ? p.width : -12),
+          x: i === 0 ? p.x + p.width : p.x - 12,
           y: p.y + 15,
           w: 12,
           h: 30,
@@ -134,7 +134,7 @@ setInterval(() => {
       }
       if (inp.fastFire && p.fastCD <= 0) {
         state.missiles.push({
-          x: p.x + (i === 0 ? p.width : -40),
+          x: i === 0 ? p.x + p.width : p.x - 40,
           y: p.y + 10,
           w: 40,
           h: 40,
