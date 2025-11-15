@@ -1,321 +1,164 @@
-<!-- vercel deploy link: https://1v1-cyan.vercel.app/
-render deploy link: https://onev1-h4qx.onrender.com -->
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Online Plane Shooter</title>
-    <style>
-      body {
-        margin: 0;
-        background: radial-gradient(
-          circle at 20% 30%,
-          #0a0a0f,
-          #121218 50%,
-          #0a0a0f 100%
-        );
-        font-family: "Orbitron", sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
-        min-height: 100vh;
-      }
-      #gameWrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        backdrop-filter: blur(20px);
-        padding: 20px;
-        border-radius: 20px;
-        background: rgba(255, 255, 255, 0.05);
-      }
-      #gameContainer {
-        width: 780px;
-        height: 300px;
-        background: rgba(15, 15, 25, 0.7);
-        border-radius: 15px;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        box-shadow: 0 0 25px rgba(0, 255, 255, 0.15);
-      }
-      canvas {
-        display: block;
-        border-radius: 15px;
-      }
-      #cooldownContainer {
-        display: flex;
-        justify-content: space-between;
-        width: 780px;
-        margin-bottom: 15px;
-      }
-      .cooldownGroup {
-        display: flex;
-        gap: 12px;
-      }
-      .cooldownBox {
-        position: relative;
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.08);
-        overflow: hidden;
-      }
-      .cooldownBox canvas {
-        width: 48px;
-        height: 48px;
-      }
-      #instructionPanel {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 40px;
-        margin-top: 22px;
-      }
-      .control-block {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-      }
-      .keyset {
-        display: flex;
-        gap: 6px;
-      }
-      .key.holo {
-        padding: 10px 14px;
-        font-size: 18px;
-        border-radius: 10px;
-        background: linear-gradient(
-          145deg,
-          rgba(0, 255, 255, 0.08),
-          rgba(0, 255, 255, 0.02)
-        );
-        border: 1px solid rgba(0, 255, 255, 0.4);
-        color: #aafaff;
-        text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
-        box-shadow: 0 0 15px rgba(0, 255, 255, 0.2),
-          inset 0 0 10px rgba(0, 255, 255, 0.15);
-      }
-      .key.holo:hover {
-        box-shadow: 0 0 25px rgba(0, 255, 255, 0.5),
-          inset 0 0 15px rgba(0, 255, 255, 0.3);
-        color: #fff;
-      }
-      .key.holo.mousekey {
-        background: linear-gradient(
-          145deg,
-          rgba(255, 165, 0, 0.1),
-          rgba(255, 165, 0, 0.02)
-        );
-        border-color: rgba(255, 165, 0, 0.4);
-        color: #ffd9a0;
-        text-shadow: 0 0 10px rgba(255, 165, 0, 0.6);
-        box-shadow: 0 0 15px rgba(255, 165, 0, 0.2),
-          inset 0 0 10px rgba(255, 165, 0, 0.15);
-      }
-      .label {
-        font-size: 13px;
-        text-transform: uppercase;
-        color: #b0eaff;
-        text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
-        letter-spacing: 1px;
-        opacity: 0.8;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="gameWrapper">
-      <div id="cooldownContainer">
-        <div class="cooldownGroup">
-          <div class="cooldownBox" id="p1Basic">
-            <canvas width="48" height="48"></canvas>
-          </div>
-          <div class="cooldownBox" id="p1Fast">
-            <canvas width="48" height="48"></canvas>
-          </div>
-        </div>
-        <div class="cooldownGroup">
-          <div class="cooldownBox" id="p2Basic">
-            <canvas width="48" height="48"></canvas>
-          </div>
-          <div class="cooldownBox" id="p2Fast">
-            <canvas width="48" height="48"></canvas>
-          </div>
-        </div>
-      </div>
-      <div id="gameContainer">
-        <canvas id="gameCanvas" width="780" height="300"></canvas>
-      </div>
-      <div id="instructionPanel">
-        <div class="control-block">
-          <div class="keyset">
-            <div class="key holo">⬆️</div>
-            <div class="key holo">⬇️</div>
-            <div class="key holo">⬅️</div>
-            <div class="key holo">➡️</div>
-          </div>
-          <div class="label">Movement</div>
-        </div>
-        <div class="control-block">
-          <div class="key holo mousekey">🖱️ Left</div>
-          <div class="label">Fire</div>
-        </div>
-        <div class="control-block">
-          <div class="key holo mousekey">🖱️ Right</div>
-          <div class="label">Fast Fire</div>
-        </div>
-      </div>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Online Plane Shooter</title>
+  <style>
+    body{margin:0;background:radial-gradient(circle at 20% 30%,#0a0a0f,#121218 50%,#0a0a0f 100%);font-family:"Orbitron",sans-serif;display:flex;justify-content:center;align-items:center;overflow:hidden;min-height:100vh}
+    #gameWrapper{display:flex;flex-direction:column;align-items:center;backdrop-filter:blur(20px);padding:20px;border-radius:20px;background:rgba(255,255,255,.05)}
+    #gameContainer{width:780px;height:300px;background:rgba(15,15,25,.7);border-radius:15px;overflow:hidden;border:1px solid rgba(255,255,255,.15);box-shadow:0 0 25px rgba(0,255,255,.15)}
+    canvas{display:block;border-radius:15px}
+    #cooldownContainer{display:flex;justify-content:space-between;width:780px;margin-bottom:15px}
+    .cooldownGroup{display:flex;gap:12px}
+    .cooldownBox{position:relative;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.08);overflow:hidden}
+    .cooldownBox canvas{width:48px;height:48px}
+    #instructionPanel{display:flex;justify-content:center;align-items:center;gap:40px;margin-top:22px}
+    .control-block{display:flex;flex-direction:column;align-items:center;gap:8px}
+    .keyset{display:flex;gap:6px}
+    .key.holo{padding:10px 14px;font-size:18px;border-radius:10px;background:linear-gradient(145deg,rgba(0,255,255,.08),rgba(0,255,255,.02));border:1px solid rgba(0,255,255,.4);color:#aafaff;text-shadow:0 0 10px rgba(0,255,255,.6);box-shadow:0 0 15px rgba(0,255,255,.2),inset 0 0 10px rgba(0,255,255,.15)}
+    .key.holo:hover{box-shadow:0 0 25px rgba(0,255,255,.5),inset 0 0 15px rgba(0,255,255,.3);color:#fff}
+    .key.holo.mousekey{background:linear-gradient(145deg,rgba(255,165,0,.1),rgba(255,165,0,.02));border-color:rgba(255,165,0,.4);color:#ffd9a0;text-shadow:0 0 10px rgba(255,165,0,.6);box-shadow:0 0 15px rgba(255,165,0,.2),inset 0 0 10px rgba(255,165,0,.15)}
+    .label{font-size:13px;text-transform:uppercase;color:#b0eaff;text-shadow:0 0 8px rgba(0,255,255,.4);letter-spacing:1px;opacity:.8}
+  </style>
+</head>
+<body>
+<div id="gameWrapper">
+  <div id="cooldownContainer">
+    <div class="cooldownGroup">
+      <div class="cooldownBox" id="p1Basic"><canvas width="48" height="48"></canvas></div>
+      <div class="cooldownBox" id="p1Fast"><canvas width="48" height="48"></canvas></div>
     </div>
+    <div class="cooldownGroup">
+      <div class="cooldownBox" id="p2Basic"><canvas width="48" height="48"></canvas></div>
+      <div class="cooldownBox" id="p2Fast"><canvas width="48" height="48"></canvas></div>
+    </div>
+  </div>
+  <div id="gameContainer"><canvas id="gameCanvas" width="780" height="300"></canvas></div>
+  <div id="instructionPanel">
+    <div class="control-block">
+      <div class="keyset">
+        <div class="key holo">⬆️</div><div class="key holo">⬇️</div><div class="key holo">⬅️</div><div class="key holo">➡️</div>
+      </div>
+      <div class="label">Movement</div>
+    </div>
+    <div class="control-block">
+      <div class="key holo mousekey">🖱️ Left</div>
+      <div class="label">Fire</div>
+    </div>
+    <div class="control-block">
+      <div class="key holo mousekey">🖱️ Right</div>
+      <div class="label">Fast Fire</div>
+    </div>
+  </div>
+</div>
 
-    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-    <script>
-      const socket = io("https://onev1-h4qx.onrender.com");
-      let playerIndex, gameState, roomId;
-      const canvas = document.getElementById("gameCanvas");
-      const ctx = canvas.getContext("2d");
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+<script>
+const socket = io("https://onev1-h4qx.onrender.com");
+let playerIndex, gameState, roomId;
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-      const cooldownCtx = {
-        p1b: document.querySelector("#p1Basic canvas").getContext("2d"),
-        p1f: document.querySelector("#p1Fast canvas").getContext("2d"),
-        p2b: document.querySelector("#p2Basic canvas").getContext("2d"),
-        p2f: document.querySelector("#p2Fast canvas").getContext("2d"),
-      };
+const cooldownCtx = {
+  p1b: document.querySelector("#p1Basic canvas").getContext("2d"),
+  p1f: document.querySelector("#p1Fast canvas").getContext("2d"),
+  p2b: document.querySelector("#p2Basic canvas").getContext("2d"),
+  p2f: document.querySelector("#p2Fast canvas").getContext("2d"),
+};
+const keys = {}, mouse = {left:false,right:false};
+window.addEventListener("keydown", e=> keys[e.key]=true);
+window.addEventListener("keyup",   e=> keys[e.key]=false);
+window.addEventListener("mousedown", e=>{
+  if(e.button===0)mouse.left=true; if(e.button===2)mouse.right=true;
+});
+window.addEventListener("mouseup", e=>{
+  if(e.button===0)mouse.left=false; if(e.button===2)mouse.right=false;
+});
+window.addEventListener("contextmenu",e=>e.preventDefault());
 
-      const keys = {},
-        mouse = { left: false, right: false };
+roomId = prompt("Enter room code:");
+if(!roomId){alert("Room code required!");location.reload();}
+socket.emit("joinRoom", roomId);
 
-      window.addEventListener("keydown", (e) => (keys[e.key] = true));
-      window.addEventListener("keyup", (e) => (keys[e.key] = false));
-      window.addEventListener("mousedown", (e) => {
-        if (e.button === 0) mouse.left = true;
-        if (e.button === 2) mouse.right = true;
-      });
-      window.addEventListener("mouseup", (e) => {
-        if (e.button === 0) mouse.left = false;
-        if (e.button === 2) mouse.right = false;
-      });
-      window.addEventListener("contextmenu", (e) => e.preventDefault());
+socket.on("init", data=>{ playerIndex=data.playerIndex; gameState=data.state; });
+socket.on("startGame", state=>{ gameState=state; animate(); });
+socket.on("roomFull",()=>{alert("Room is full!");location.reload();});
+socket.on("playerLeft",()=>{alert("Other player left!");location.reload();});
+socket.on("gameOver",data=>{
+  alert(data.winner===playerIndex?"You win!":"You lose!"); location.reload();
+});
 
-      roomId = prompt("Enter room code:");
-      if (!roomId) {
-        alert("Room code required!");
-        location.reload();
-      }
-      socket.emit("joinRoom", roomId);
+// ---- networking: delta + interpolation ----
+let lastSnap=null, newSnap=null, snapTime=0;
+socket.on("update", pack=>{ lastSnap=newSnap||pack.d; newSnap=pack.d; snapTime=pack.t; });
 
-      socket.on("init", (data) => {
-        playerIndex = data.playerIndex;
-        gameState = data.state;
-        console.log("Player initialized:", playerIndex); // Debug log
-      });
-      socket.on("startGame", (state) => {
-        gameState = state;
-        animate();
-        console.log("Game started"); // Debug log
-      });
-      socket.on("update", (state) => {
-        gameState = state;
-      });
+const PLAYER_SPEED=7; // same as server
+function sendInput(){
+  if(playerIndex===undefined||!gameState){requestAnimationFrame(sendInput);return;}
+  const input = {
+    up:keys["ArrowUp"]||false, down:keys["ArrowDown"]||false,
+    left:keys["ArrowLeft"]||false, right:keys["ArrowRight"]||false,
+    fire:mouse.left||false, fastFire:mouse.right||false
+  };
+  // instant local prediction
+  const me = gameState.players[playerIndex];
+  if(me){
+    if(input.up)   me.y-=PLAYER_SPEED; if(input.down) me.y+=PLAYER_SPEED;
+    if(input.left) me.x-=PLAYER_SPEED; if(input.right)me.x+=PLAYER_SPEED;
+    me.x=Math.max(0,Math.min(780-60,me.x)); me.y=Math.max(0,Math.min(300-60,me.y));
+  }
+  socket.emit("input",{roomId,input});
+  requestAnimationFrame(sendInput);
+}
+sendInput();
 
-      socket.on("roomFull", () => {
-        alert("Room is full!");
-        location.reload();
-      });
+// ---- render helpers ----
+function drawCooldown(ctx,ratio,color){
+  const s=48; ctx.clearRect(0,0,s,s); if(ratio<=0)return;
+  const ang=ratio*2*Math.PI; ctx.fillStyle=color; ctx.globalAlpha=.4;
+  ctx.beginPath(); ctx.moveTo(s/2,s/2); ctx.arc(s/2,s/2,s/2,-Math.PI/2,-Math.PI/2+ang); ctx.fill();
+  ctx.globalAlpha=1;
+}
+function drawPlane(p){
+  const topH=p.height*.2;
+  ctx.fillStyle="rgba(255,255,255,.1)"; ctx.fillRect(p.x,p.y,p.width,topH);
+  ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y+topH,p.width,p.height-topH);
+  ctx.fillStyle="#0f0"; const hpRatio=Math.max(0,p.hp/50);
+  ctx.fillRect(p.x,p.y,p.width*hpRatio,topH);
+}
+function drawMissiles(){
+  ctx.shadowColor="yellow"; ctx.shadowBlur=15;
+  gameState.missiles.forEach(m=>{ ctx.fillStyle="yellow"; ctx.fillRect(m.x,m.y,m.w,m.h); });
+  ctx.shadowBlur=0;
+}
 
-      socket.on("playerLeft", () => {
-        alert("Other player left!");
-        location.reload();
-      });
+// ---- main loop ----
+function animate(){
+  if(!gameState||!lastSnap||!newSnap){requestAnimationFrame(animate);return;}
 
-      socket.on("gameOver", (data) => {
-        const winner = data.winner === playerIndex ? "You win!" : "You lose!";
-        alert(winner);
-        location.reload();
-      });
+  // interpolate
+  const now=Date.now(), dt=Math.min(1,(now-snapTime)/50);
+  function l(a,b,t){return a+(b-a)*t;}
+  const [p0x,p0y,p1x,p1y] = [
+    l(lastSnap.p0x??gameState.players[0].x, newSnap.p0x??gameState.players[0].x, dt),
+    l(lastSnap.p0y??gameState.players[0].y, newSnap.p0y??gameState.players[0].y, dt),
+    l(lastSnap.p1x??gameState.players[1].x, newSnap.p1x??gameState.players[1].x, dt),
+    l(lastSnap.p1y??gameState.players[1].y, newSnap.p1y??gameState.players[1].y, dt)
+  ];
+  gameState.players[0].x=p0x; gameState.players[0].y=p0y;
+  gameState.players[1].x=p1x; gameState.players[1].y=p1y;
 
-      function sendInput() {
-        if (playerIndex === undefined || !roomId || !gameState) {
-          requestAnimationFrame(sendInput);
-          return;
-        }
-        const input = {
-          up: keys["ArrowUp"] || false,
-          down: keys["ArrowDown"] || false,
-          left: keys["ArrowLeft"] || false,
-          right: keys["ArrowRight"] || false,
-          fire: mouse.left || false,
-          fastFire: mouse.right || false,
-        };
-        socket.emit("input", { roomId, input });
-        requestAnimationFrame(sendInput);
-      }
-      sendInput();
-
-      function drawCooldown(ctx, ratio, color) {
-        const s = 48;
-        ctx.clearRect(0, 0, s, s);
-        if (ratio <= 0) return;
-        const ang = ratio * 2 * Math.PI;
-        ctx.fillStyle = color;
-        ctx.globalAlpha = 0.4;
-        ctx.beginPath();
-        ctx.moveTo(s / 2, s / 2);
-        ctx.arc(s / 2, s / 2, s / 2, -Math.PI / 2, -Math.PI / 2 + ang);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-      }
-
-      function drawPlane(p) {
-        const topH = p.height * 0.2;
-        ctx.fillStyle = "rgba(255,255,255,0.1)";
-        ctx.fillRect(p.x, p.y, p.width, topH);
-        ctx.fillStyle = p.color;
-        ctx.fillRect(p.x, p.y + topH, p.width, p.height - topH);
-        ctx.fillStyle = "#00ff00";
-        const hpRatio = Math.max(0, p.hp / 50);
-        ctx.fillRect(p.x, p.y, p.width * hpRatio, topH);
-      }
-
-      function drawMissiles() {
-        ctx.shadowColor = "yellow";
-        ctx.shadowBlur = 15;
-        gameState.missiles.forEach((m) => {
-          ctx.fillStyle = "yellow";
-          ctx.fillRect(m.x, m.y, m.w, m.h);
-        });
-        ctx.shadowBlur = 0;
-      }
-
-      function animate() {
-        if (!gameState) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        gameState.players.forEach(drawPlane);
-        drawMissiles();
-        drawCooldown(
-          cooldownCtx.p1b,
-          gameState.players[0].basicCD / 0.5,
-          "#0ff"
-        );
-        drawCooldown(
-          cooldownCtx.p1f,
-          gameState.players[0].fastCD / 6,
-          "#ffb84d"
-        );
-        drawCooldown(
-          cooldownCtx.p2b,
-          gameState.players[1].basicCD / 0.5,
-          "#0ff"
-        );
-        drawCooldown(
-          cooldownCtx.p2f,
-          gameState.players[1].fastCD / 6,
-          "#ffb84d"
-        );
-        requestAnimationFrame(animate);
-      }
-    </script>
-  </body>
+  // draw
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  gameState.players.forEach(drawPlane);
+  drawMissiles();
+  drawCooldown(cooldownCtx.p1b,gameState.players[0].basicCD/.5,"#0ff");
+  drawCooldown(cooldownCtx.p1f,gameState.players[0].fastCD/6,"#ffb84d");
+  drawCooldown(cooldownCtx.p2b,gameState.players[1].basicCD/.5,"#0ff");
+  drawCooldown(cooldownCtx.p2f,gameState.players[1].fastCD/6,"#ffb84d");
+  requestAnimationFrame(animate);
+}
+</script>
+</body>
 </html>
