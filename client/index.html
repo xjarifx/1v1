@@ -4,50 +4,52 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Online Plane Shooter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body{margin:0;background:radial-gradient(circle at 20% 30%,#0a0a0f,#121218 50%,#0a0a0f 100%);font-family:"Orbitron",sans-serif;display:flex;justify-content:center;align-items:center;overflow:hidden;min-height:100vh}
-    #gameWrapper{display:flex;flex-direction:column;align-items:center;backdrop-filter:blur(20px);padding:20px;border-radius:20px;background:rgba(255,255,255,.05)}
-    #gameContainer{width:780px;height:300px;background:rgba(15,15,25,.7);border-radius:15px;overflow:hidden;border:1px solid rgba(255,255,255,.15);box-shadow:0 0 25px rgba(0,255,255,.15)}
-    canvas{display:block;border-radius:15px}
-    #cooldownContainer{display:flex;justify-content:space-between;width:780px;margin-bottom:15px}
-    .cooldownGroup{display:flex;gap:12px}
-    .cooldownBox{position:relative;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.08);overflow:hidden}
-    .cooldownBox canvas{width:48px;height:48px}
-    #instructionPanel{display:flex;justify-content:center;align-items:center;gap:40px;margin-top:22px}
-    .control-block{display:flex;flex-direction:column;align-items:center;gap:8px}
-    .keyset{display:flex;gap:6px}
-    .key.holo{padding:10px 14px;font-size:18px;border-radius:10px;background:linear-gradient(145deg,rgba(0,255,255,.08),rgba(0,255,255,.02));border:1px solid rgba(0,255,255,.4);color:#aafaff;text-shadow:0 0 10px rgba(0,255,255,.6);box-shadow:0 0 15px rgba(0,255,255,.2),inset 0 0 10px rgba(0,255,255,.15)}
-    .key.holo:hover{box-shadow:0 0 25px rgba(0,255,255,.5),inset 0 0 15px rgba(0,255,255,.3);color:#fff}
-    .key.holo.mousekey{background:linear-gradient(145deg,rgba(255,165,0,.1),rgba(255,165,0,.02));border-color:rgba(255,165,0,.4);color:#ffd9a0;text-shadow:0 0 10px rgba(255,165,0,.6);box-shadow:0 0 15px rgba(255,165,0,.2),inset 0 0 10px rgba(255,165,0,.15)}
-    .label{font-size:13px;text-transform:uppercase;color:#b0eaff;text-shadow:0 0 8px rgba(0,255,255,.4);letter-spacing:1px;opacity:.8}
+    :root{--cyan:#00ffff;--orange:#ff9933;--bg:#0a0a0f;--panel:rgba(15,15,25,.65);--glow:0 0 15px var(--cyan),0 0 30px rgba(0,255,255,.25);}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Orbitron',sans-serif;background:var(--bg);background-image:radial-gradient(circle at 20% 30%,rgba(0,255,255,.08) 0%,transparent 40%),radial-gradient(circle at 80% 70%,rgba(255,153,51,.06) 0%,transparent 40%);display:flex;justify-content:center;align-items:center;min-height:100vh;color:#fff;overflow:hidden;}
+    #gameWrapper{width:90vw;max-width:840px;animation:fadeIn 1s ease-out;}@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    #loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:999;animation:fadeOut 1s 2s forwards}@keyframes fadeOut{to{opacity:0;pointer-events:none}}
+    .loaderText{font-size:24px;margin-bottom:12px;animation:pulse 1.2s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .bar{width:220px;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;}.barFill{height:100%;width:0%;background:var(--cyan);animation:load 1.5s ease-out 1s forwards}@keyframes load{to{width:100%}}
+    #topBar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding:0 8px;}.hud{display:flex;gap:12px;align-items:center;}.healthBar{width:140px;height:14px;background:rgba(255,255,255,.1);border-radius:7px;overflow:hidden;border:1px solid rgba(0,255,255,.4);}.healthFill{height:100%;background:linear-gradient(90deg,var(--cyan),#00ff99);transition:width .3s ease;}
+    #gameContainer{background:var(--panel);border:1px solid rgba(0,255,255,.3);border-radius:16px;box-shadow:var(--glow);overflow:hidden;}canvas{display:block;}
+    #controls{margin-top:18px;display:flex;justify-content:space-between;align-items:flex-start;}.controlBlock{text-align:center;}.keyRow{display:flex;gap:6px;margin-bottom:6px;}.key{padding:10px 14px;border-radius:10px;background:linear-gradient(145deg,rgba(0,255,255,.08),rgba(0,255,255,.02));border:1px solid rgba(0,255,255,.4);color:#aafaff;text-shadow:0 0 10px rgba(0,255,255,.6);box-shadow:0 0 15px rgba(0,255,255,.2),inset 0 0 10px rgba(0,255,255,.15);transition:all .15s ease;}.key.pressed{transform:scale(.95);box-shadow:0 0 25px rgba(0,255,255,.7),inset 0 0 15px rgba(0,255,255,.4);color:#fff;}.key.mouse{background:linear-gradient(145deg,rgba(255,165,0,.1),rgba(255,165,0,.02));border-color:rgba(255,165,0,.4);color:#ffd9a0;text-shadow:0 0 10px rgba(255,165,0,.6);}.label{font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:.8;margin-top:4px;}
+    .cooldownGroup{display:flex;gap:10px;}.cooldownBox{width:44px;height:44px;border-radius:50%;background:var(--panel);border:1px solid rgba(0,255,255,.4);box-shadow:var(--glow);overflow:hidden;}.cooldownBox canvas{width:100%;height:100%;}
   </style>
 </head>
 <body>
+
+<div id="loader">
+  <div class="loaderText">Waiting for opponent…</div>
+  <div class="bar"><div class="barFill"></div></div>
+</div>
+
 <div id="gameWrapper">
-  <div id="cooldownContainer">
-    <div class="cooldownGroup">
-      <div class="cooldownBox" id="p1Basic"><canvas width="48" height="48"></canvas></div>
-      <div class="cooldownBox" id="p1Fast"><canvas width="48" height="48"></canvas></div>
-    </div>
-    <div class="cooldownGroup">
-      <div class="cooldownBox" id="p2Basic"><canvas width="48" height="48"></canvas></div>
-      <div class="cooldownBox" id="p2Fast"><canvas width="48" height="48"></canvas></div>
-    </div>
+  <div id="topBar">
+    <div class="hud"><span>P1</span><div class="healthBar"><div class="healthFill" id="p1Health"></div></div></div>
+    <div class="hud"><div class="healthBar"><div class="healthFill" id="p2Health"></div></div><span>P2</span></div>
   </div>
+
   <div id="gameContainer"><canvas id="gameCanvas" width="780" height="300"></canvas></div>
-  <div id="instructionPanel">
-    <div class="control-block">
-      <div class="keyset">
-        <div class="key holo">⬆️</div><div class="key holo">⬇️</div><div class="key holo">⬅️</div><div class="key holo">➡️</div>
+
+  <div id="controls">
+    <div class="controlBlock">
+      <div class="keyRow"><div class="key" data-key="ArrowUp">⬆️</div></div>
+      <div class="keyRow">
+        <div class="key" data-key="ArrowLeft">⬅️</div>
+        <div class="key" data-key="ArrowDown">⬇️</div>
+        <div class="key" data-key="ArrowRight">➡️</div>
       </div>
       <div class="label">Movement</div>
     </div>
-    <div class="control-block">
-      <div class="key holo mousekey">🖱️ Left</div>
+    <div class="controlBlock">
+      <div class="keyRow"><div class="key mouse" data-mouse="left">🖱️ Left</div></div>
       <div class="label">Fire</div>
     </div>
-    <div class="control-block">
-      <div class="key holo mousekey">🖱️ Right</div>
+    <div class="controlBlock">
+      <div class="keyRow"><div class="key mouse" data-mouse="right">🖱️ Right</div></div>
       <div class="label">Fast Fire</div>
     </div>
   </div>
@@ -59,22 +61,20 @@ const socket = io("https://onev1-h4qx.onrender.com");
 let playerIndex, gameState, roomId;
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-
 const cooldownCtx = {
-  p1b: document.querySelector("#p1Basic canvas").getContext("2d"),
-  p1f: document.querySelector("#p1Fast canvas").getContext("2d"),
-  p2b: document.querySelector("#p2Basic canvas").getContext("2d"),
-  p2f: document.querySelector("#p2Fast canvas").getContext("2d"),
+  p1b: document.querySelector("#p1Basic canvas")?.getContext("2d") || document.createElement("canvas").getContext("2d"),
+  p1f: document.querySelector("#p1Fast canvas")?.getContext("2d") || document.createElement("canvas").getContext("2d"),
+  p2b: document.querySelector("#p2Basic canvas")?.getContext("2d") || document.createElement("canvas").getContext("2d"),
+  p2f: document.querySelector("#p2Fast canvas")?.getContext("2d") || document.createElement("canvas").getContext("2d"),
 };
 const keys = {}, mouse = {left:false,right:false};
-window.addEventListener("keydown", e=> keys[e.key]=true);
-window.addEventListener("keyup",   e=> keys[e.key]=false);
-window.addEventListener("mousedown", e=>{
-  if(e.button===0)mouse.left=true; if(e.button===2)mouse.right=true;
-});
-window.addEventListener("mouseup", e=>{
-  if(e.button===0)mouse.left=false; if(e.button===2)mouse.right=false;
-});
+
+window.addEventListener("keydown", e=> { keys[e.key]=true; const k=document.querySelector(`[data-key="${e.key}"]`); if(k) k.classList.add("pressed"); });
+window.addEventListener("keyup",   e=> { keys[e.key]=false; const k=document.querySelector(`[data-key="${e.key}"]`); if(k) k.classList.remove("pressed"); });
+window.addEventListener("mousedown", e=> { if(e.button===0)mouse.left=true; if(e.button===2)mouse.right=true;
+  const k=document.querySelector(`[data-mouse="${e.button===0?'left':'right'}"]`); if(k)k.classList.add("pressed"); });
+window.addEventListener("mouseup", e=> { if(e.button===0)mouse.left=false; if(e.button===2)mouse.right=false;
+  const k=document.querySelector(`[data-mouse="${e.button===0?'left':'right'}"]`); if(k)k.classList.remove("pressed"); });
 window.addEventListener("contextmenu",e=>e.preventDefault());
 
 roomId = prompt("Enter room code:");
@@ -82,81 +82,43 @@ if(!roomId){alert("Room code required!");location.reload();}
 socket.emit("joinRoom", roomId);
 
 socket.on("init", data=>{ playerIndex=data.playerIndex; gameState=data.state; });
-socket.on("startGame", state=>{ gameState=state; animate(); });
+socket.on("startGame", state=>{ gameState=state; animate(); document.getElementById("loader").style.display="none"; });
 socket.on("roomFull",()=>{alert("Room is full!");location.reload();});
 socket.on("playerLeft",()=>{alert("Other player left!");location.reload();});
-socket.on("gameOver",data=>{
-  alert(data.winner===playerIndex?"You win!":"You lose!"); location.reload();
-});
+socket.on("gameOver",data=>{alert(data.winner===playerIndex?"You win!":"You lose!");location.reload();});
 
-// ---- networking: delta + interpolation ----
+// ---- networking ----
 let lastSnap=null, newSnap=null, snapTime=0;
 socket.on("update", pack=>{ lastSnap=newSnap||pack.d; newSnap=pack.d; snapTime=pack.t; });
 
-const PLAYER_SPEED=7; // same as server
+const PLAYER_SPEED=7;
 function sendInput(){
   if(playerIndex===undefined||!gameState){requestAnimationFrame(sendInput);return;}
-  const input = {
-    up:keys["ArrowUp"]||false, down:keys["ArrowDown"]||false,
-    left:keys["ArrowLeft"]||false, right:keys["ArrowRight"]||false,
-    fire:mouse.left||false, fastFire:mouse.right||false
-  };
-  // instant local prediction
-  const me = gameState.players[playerIndex];
-  if(me){
-    if(input.up)   me.y-=PLAYER_SPEED; if(input.down) me.y+=PLAYER_SPEED;
-    if(input.left) me.x-=PLAYER_SPEED; if(input.right)me.x+=PLAYER_SPEED;
-    me.x=Math.max(0,Math.min(780-60,me.x)); me.y=Math.max(0,Math.min(300-60,me.y));
-  }
-  socket.emit("input",{roomId,input});
-  requestAnimationFrame(sendInput);
+  const input = { up:keys["ArrowUp"]||false, down:keys["ArrowDown"]||false, left:keys["ArrowLeft"]||false, right:keys["ArrowRight"]||false, fire:mouse.left||false, fastFire:mouse.right||false };
+  // predict
+  const me=gameState.players[playerIndex];
+  if(me){ if(input.up)me.y-=PLAYER_SPEED; if(input.down)me.y+=PLAYER_SPEED; if(input.left)me.x-=PLAYER_SPEED; if(input.right)me.x+=PLAYER_SPEED; me.x=Math.max(0,Math.min(780-60,me.x)); me.y=Math.max(0,Math.min(300-60,me.y)); }
+  socket.emit("input",{roomId,input}); requestAnimationFrame(sendInput);
 }
 sendInput();
 
 // ---- render helpers ----
-function drawCooldown(ctx,ratio,color){
-  const s=48; ctx.clearRect(0,0,s,s); if(ratio<=0)return;
-  const ang=ratio*2*Math.PI; ctx.fillStyle=color; ctx.globalAlpha=.4;
-  ctx.beginPath(); ctx.moveTo(s/2,s/2); ctx.arc(s/2,s/2,s/2,-Math.PI/2,-Math.PI/2+ang); ctx.fill();
-  ctx.globalAlpha=1;
-}
-function drawPlane(p){
-  const topH=p.height*.2;
-  ctx.fillStyle="rgba(255,255,255,.1)"; ctx.fillRect(p.x,p.y,p.width,topH);
-  ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y+topH,p.width,p.height-topH);
-  ctx.fillStyle="#0f0"; const hpRatio=Math.max(0,p.hp/50);
-  ctx.fillRect(p.x,p.y,p.width*hpRatio,topH);
-}
-function drawMissiles(){
-  ctx.shadowColor="yellow"; ctx.shadowBlur=15;
-  gameState.missiles.forEach(m=>{ ctx.fillStyle="yellow"; ctx.fillRect(m.x,m.y,m.w,m.h); });
-  ctx.shadowBlur=0;
-}
+function drawCooldown(ctx,ratio,color){ const s=44; ctx.clearRect(0,0,s,s); if(ratio<=0)return; const ang=ratio*2*Math.PI; ctx.fillStyle=color; ctx.globalAlpha=.4; ctx.beginPath(); ctx.moveTo(s/2,s/2); ctx.arc(s/2,s/2,s/2,-Math.PI/2,-Math.PI/2+ang); ctx.fill(); ctx.globalAlpha=1; }
+function drawPlane(p){ const topH=p.height*.2; ctx.shadowColor=p.color; ctx.shadowBlur=12; ctx.fillStyle="rgba(255,255,255,.1)"; ctx.fillRect(p.x,p.y,p.width,topH); ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y+topH,p.width,p.height-topH); ctx.fillStyle="#0f0"; const hpRatio=Math.max(0,p.hp/50); ctx.fillRect(p.x,p.y,p.width*hpRatio,topH); ctx.shadowBlur=0; }
+function drawMissiles(){ ctx.shadowColor="yellow"; ctx.shadowBlur=15; gameState.missiles.forEach(m=>{ ctx.fillStyle="yellow"; ctx.fillRect(m.x,m.y,m.w,m.h); }); ctx.shadowBlur=0; }
+function updateHealth(){ if(!gameState)return; document.getElementById("p1Health").style.width=gameState.players[0].hp*2+"%"; document.getElementById("p2Health").style.width=gameState.players[1].hp*2+"%"; }
 
 // ---- main loop ----
 function animate(){
   if(!gameState||!lastSnap||!newSnap){requestAnimationFrame(animate);return;}
-
-  // interpolate
   const now=Date.now(), dt=Math.min(1,(now-snapTime)/50);
   function l(a,b,t){return a+(b-a)*t;}
-  const [p0x,p0y,p1x,p1y] = [
-    l(lastSnap.p0x??gameState.players[0].x, newSnap.p0x??gameState.players[0].x, dt),
-    l(lastSnap.p0y??gameState.players[0].y, newSnap.p0y??gameState.players[0].y, dt),
-    l(lastSnap.p1x??gameState.players[1].x, newSnap.p1x??gameState.players[1].x, dt),
-    l(lastSnap.p1y??gameState.players[1].y, newSnap.p1y??gameState.players[1].y, dt)
-  ];
-  gameState.players[0].x=p0x; gameState.players[0].y=p0y;
-  gameState.players[1].x=p1x; gameState.players[1].y=p1y;
-
-  // draw
+  const [p0x,p0y,p1x,p1y]=[ l(lastSnap.p0x??gameState.players[0].x,newSnap.p0x??gameState.players[0].x,dt), l(lastSnap.p0y??gameState.players[0].y,newSnap.p0y??gameState.players[0].y,dt), l(lastSnap.p1x??gameState.players[1].x,newSnap.p1x??gameState.players[1].x,dt), l(lastSnap.p1y??gameState.players[1].y,newSnap.p1y??gameState.players[1].y,dt) ];
+  gameState.players[0].x=p0x; gameState.players[0].y=p0y; gameState.players[1].x=p1x; gameState.players[1].y=p1y;
   ctx.clearRect(0,0,canvas.width,canvas.height);
   gameState.players.forEach(drawPlane);
   drawMissiles();
-  drawCooldown(cooldownCtx.p1b,gameState.players[0].basicCD/.5,"#0ff");
-  drawCooldown(cooldownCtx.p1f,gameState.players[0].fastCD/6,"#ffb84d");
-  drawCooldown(cooldownCtx.p2b,gameState.players[1].basicCD/.5,"#0ff");
-  drawCooldown(cooldownCtx.p2f,gameState.players[1].fastCD/6,"#ffb84d");
+  updateHealth();
   requestAnimationFrame(animate);
 }
 </script>

@@ -1,7 +1,6 @@
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
-
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -13,7 +12,7 @@ const io = new Server(server, {
 });
 app.use(express.static(__dirname + "/../client"));
 
-const TICK_RATE = 20; // 60 → 20
+const TICK_RATE = 20;
 const PLAYER_SPEED = 7;
 const MISSILE_SPEED_BASIC = 15;
 const MISSILE_SPEED_FAST = 25;
@@ -21,7 +20,6 @@ const COOLDOWN_BASIC = 0.5;
 const COOLDOWN_FAST = 6;
 const GAME_WIDTH = 780;
 const GAME_HEIGHT = 300;
-
 let rooms = {};
 
 function createRoomState() {
@@ -54,7 +52,6 @@ function createRoomState() {
   };
 }
 
-// delta encoder
 function makeDelta(old, cur) {
   const d = {};
   if (old.players[0].x !== cur.players[0].x) d.p0x = cur.players[0].x;
@@ -108,13 +105,11 @@ io.on("connection", (socket) => {
   });
 });
 
-// game loop
 setInterval(() => {
   for (const roomId in rooms) {
     const room = rooms[roomId];
     const state = room.state;
 
-    // physics
     state.players.forEach((p, i) => {
       const inp = p.input || {};
       if (inp.up) p.y -= PLAYER_SPEED;
@@ -150,7 +145,6 @@ setInterval(() => {
       }
     });
 
-    // missiles
     for (let i = state.missiles.length - 1; i >= 0; i--) {
       const m = state.missiles[i];
       m.x += m.speed;
@@ -170,7 +164,6 @@ setInterval(() => {
       }
     }
 
-    // send delta
     if (!room.last) room.last = JSON.parse(JSON.stringify(state));
     const delta = makeDelta(room.last, state);
     room.last = JSON.parse(JSON.stringify(state));
