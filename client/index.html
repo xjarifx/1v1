@@ -593,6 +593,7 @@
         ctx.shadowBlur = 0;
       }
       function drawMissiles() {
+        if (!gameState.missiles || gameState.missiles.length === 0) return;
         gameState.missiles.forEach((m) => {
           ctx.shadowColor = "#ffdd00";
           ctx.shadowBlur = 20;
@@ -653,8 +654,24 @@
         gameState.players[1].x = p1x;
         gameState.players[1].y = p1y;
 
-        // Clear canvas with semi-transparent background
-        ctx.fillStyle = "rgba(10, 15, 30, 0.4)";
+        // Apply delta updates for missiles and cooldowns
+        if (newSnap.m !== undefined) gameState.missiles = newSnap.m;
+        if (newSnap.p0b !== undefined)
+          gameState.players[0].basicCD = newSnap.p0b;
+        if (newSnap.p0f !== undefined)
+          gameState.players[0].fastCD = newSnap.p0f;
+        if (newSnap.p1b !== undefined)
+          gameState.players[1].basicCD = newSnap.p1b;
+        if (newSnap.p1f !== undefined)
+          gameState.players[1].fastCD = newSnap.p1f;
+        if (newSnap.p0h !== undefined) gameState.players[0].hp = newSnap.p0h;
+        if (newSnap.p1h !== undefined) gameState.players[1].hp = newSnap.p1h;
+
+        // Clear canvas completely
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw dark background
+        ctx.fillStyle = "rgba(10, 15, 30, 0.95)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         gameState.players.forEach(drawPlane);
